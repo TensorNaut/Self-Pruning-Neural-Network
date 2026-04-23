@@ -1,25 +1,24 @@
 # Self-Pruning Neural Network  
-**Dynamic Sparsification with Learnable Gates (PyTorch)**
+Dynamic Sparsification with Learnable Gates (PyTorch)
 
 ---
 
 ## Overview
 
-This repository implements a **self-pruning neural network** that learns to remove its own redundant connections *during training*, instead of relying on post-training pruning.
+This repository implements a self-pruning neural network that learns to remove redundant connections during training, rather than relying on post-training pruning.
 
-Each weight is paired with a learnable gate that controls its importance. Through L1 regularization, the network automatically suppresses unnecessary weights, resulting in a sparse and efficient model.
+Each weight is associated with a learnable gate that determines its importance. Through L1 regularization on these gates, the model suppresses unnecessary weights and learns a sparse and efficient representation.
 
 ---
 
 ## Key Idea
 
-Each weight \( w \) is modulated by a learnable gate:
+Each weight `w` is modulated by a learnable gate:
+```
+w' = w * sigmoid(g)
+```
 
-\[
-w' = w \cdot \sigma(g)
-\]
-
-- \( \sigma(g) \in (0,1) \) acts as a soft mask  
+- `sigmoid(g) ∈ (0,1)` acts as a soft mask  
 - Small gate values → weight effectively pruned  
 - Large gate values → weight retained  
 
@@ -35,13 +34,14 @@ w' = w \cdot \sigma(g)
 ---
 
 ## Loss Function
+```
+L = L_CE + λ * sum(sigmoid(g))
+```
 
-\[
-\mathcal{L} = \mathcal{L}_{CE} + \lambda \cdot \sum |\sigma(g)|
-\]
 
-- Cross-entropy for classification  
-- L1 penalty on gates → enforces sparsity  
+- `L_CE`: Cross-entropy loss  
+- `λ`: sparsity regularization coefficient  
+- L1 penalty on gates encourages sparsity  
 
 ---
 
@@ -52,7 +52,7 @@ w' = w \cdot \sigma(g)
 | Lambda | Test Accuracy (%) | Sparsity (%) |
 |--------|------------------|-------------|
 | 1e-05  | 55.37            | 10.97       |
-| 1e-04  | **56.09**        | 59.33       |
+| 1e-04  | 56.09            | 59.33       |
 | 5e-04  | 55.75            | 93.03       |
 | 1e-03  | 54.47            | 97.90       |
 | 2e-03  | 53.08            | 99.27       |
@@ -62,31 +62,25 @@ w' = w \cdot \sigma(g)
 ## Key Insights
 
 ### 1. Sparsity Improves Generalization
-- Best accuracy at **λ = 1e-4**
-- Moderate pruning acts as a **regularizer**
-
----
+- Best accuracy at λ = 1e-4  
+- Moderate pruning acts as a regularizer  
 
 ### 2. Over-Pruning Hurts Performance
-- High λ → extreme sparsity (>97%)
-- Leads to **loss of model capacity**
-
----
+- High λ leads to extreme sparsity (>97%)  
+- Causes loss of model capacity and underfitting  
 
 ### 3. Model Compression
-- ~59% sparsity → **~2.4× parameter reduction**
-- ~99% sparsity → up to **~100× reduction (theoretical)**
-
----
+- ~59% sparsity corresponds to ~2.4× parameter reduction  
+- ~99% sparsity can yield up to ~100× reduction (theoretical)  
 
 ### 4. Training Dynamics
 
-Sparsity follows a **sigmoidal growth pattern**:
-- Early → model learns features  
-- Mid → rapid pruning  
-- Late → saturation  
+Sparsity follows a sigmoidal growth pattern:
+- Early phase: minimal pruning, feature learning  
+- Mid phase: rapid pruning of redundant connections  
+- Late phase: saturation and stable sparse structure  
 
-This shows the model **first learns, then compresses itself**.
+The model first learns meaningful representations and then compresses itself.
 
 ---
 
