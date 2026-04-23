@@ -1,7 +1,8 @@
 # Self-Pruning Neural Network — Report
-**Assignment:** Tredence Analytics – AI Engineer Case Study  
+**Tredence Analytics – AI Engineer Case Study**  
 **Dataset:** CIFAR-10  
 **Author:** Tushar Jagannath Jagatap
+**Problem Title:** The Self-Pruning Neural Network
 
 ---
 
